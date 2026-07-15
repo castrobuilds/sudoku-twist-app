@@ -1,8 +1,12 @@
+import { SelectedCell } from "./cell";
 import { Grid } from "./grid";
 
 export type GridState = {
   grid: Grid;
 
-  setCellValue: (id: string, value: number | null) => void;
   resetGrid: () => void;
+  setCellValue: (id: string, value: number | null) => void;
+
+  selectedCell: SelectedCell;
+  setSelectedCell: (cell: SelectedCell) => void;
 };

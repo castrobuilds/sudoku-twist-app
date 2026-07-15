@@ -16,4 +16,13 @@ export const useGridStore = create<GridState>((set) => ({
       grid: createEmptyGrid(9),
     });
   },
+
+  // SELECTED CELL
+  selectedCell: null,
+
+  setSelectedCell: (cell) => {
+    set({ selectedCell: cell });
+  },
+
+  //
 }));

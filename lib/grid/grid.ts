@@ -1,3 +1,4 @@
+import { useGridStore } from "@/store/grid.store";
 import { Cell, CellId } from "@/types/grid";
 import { Grid } from "@/types/grid";
 
@@ -27,6 +28,7 @@ export function createEmptyGrid(size: number = DEFAULT_SIZE): Grid {
         id,
         row,
         col,
+        box: getBoxIndex(size, row, col),
         value: null,
         fixed: false,
         notes: [],
@@ -74,9 +76,8 @@ export function getBoxCells(grid: Grid, row: number, col: number): Cell[] {
   return cells;
 }
 
-export function getBoxIndex(grid: Grid, row: number, col: number): number {
-  const boxSize = Math.sqrt(grid.size);
-
+export function getBoxIndex(size: number, row: number, col: number): number {
+  const boxSize = Math.sqrt(size);
   return Math.floor(row / boxSize) * boxSize + Math.floor(col / boxSize);
 }
 

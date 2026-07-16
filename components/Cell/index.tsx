@@ -57,7 +57,25 @@ export function Cell({ cell, row, col }: Props) {
         ${!isSelected && isSameBox ? "bg-yellow-50" : ""}
       `}
     >
-      {cell.value ?? ""}
+      {cell.value !== null ? (
+        cell.value
+      ) : cell.notes && cell.notes.length > 0 ? (
+        <div className="grid grid-cols-3 grid-rows-3 w-full h-full text-[9px] leading-none">
+          {Array.from({ length: 9 }, (_, i) => {
+            const n = i + 1;
+            const hasNote = cell.notes?.includes(n);
+
+            return (
+              <div
+                key={n}
+                className="flex items-center justify-center text-gray-500"
+              >
+                {hasNote ? n : ""}
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
     </div>
   );
 }

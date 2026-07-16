@@ -6,8 +6,11 @@ export type GridState = {
 
   resetGrid: () => void;
   setCellValue: (id: string, value: number | null) => void;
-  setValueForSelected: (value: number | null) => void;
+  setInputForSelected: (value: number | null) => void;
 
   selectedCell: SelectedCell;
   setSelectedCell: (cell: SelectedCell) => void;
+
+  notesMode: boolean;
+  toggleNotesMode: () => void;
 };

@@ -8,7 +8,9 @@ export default function Home() {
   useNumberInput();
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <Grid />
+      <div className="border-4 border-black">
+        <Grid />
+      </div>
       <NumberPad />
     </div>
   );

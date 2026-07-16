@@ -84,6 +84,8 @@ export const useGridStore = create<GridState>((set) => ({
   resetGrid: () => {
     set({
       grid: createEmptyGrid(9),
+      selectedCell: null,
+      notesMode: false,
     });
   },
 

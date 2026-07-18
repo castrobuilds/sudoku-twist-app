@@ -6,7 +6,7 @@ import { getCellId } from "@/lib/grid";
 
 export function Grid() {
   const grid = useGridStore((state) => state.grid);
-  const setSelectedCell = useGridStore((state) => state.setSelectedCell);
+  const invalidCells = useGridStore((state) => state.invalidCells);
 
   if (!grid) return null;
 
@@ -20,7 +20,13 @@ export function Grid() {
 
             return (
               <div key={cellId} className="flex-1">
-                <Cell key={cellId} cell={cell} row={row} col={col} />
+                <Cell
+                  key={cellId}
+                  cell={cell}
+                  row={row}
+                  col={col}
+                  invalidCells={invalidCells}
+                />
               </div>
             );
           })}

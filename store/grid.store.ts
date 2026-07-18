@@ -1,84 +1,67 @@
 import { create } from "zustand";
 import { GridState } from "@/types/grid";
 import { createEmptyGrid, getCellId, updateCell } from "@/lib/grid";
+import { validateGrid } from "@/lib/validation/validateGrid";
 
-export const useGridStore = create<GridState>((set) => ({
+export const useGridStore = create<GridState>((set, get) => ({
   grid: createEmptyGrid(9),
 
   selectedCell: null,
-
   notesMode: false,
+
+  invalidCells: new Set(),
 
   // ACTIONS
   setCellValue: (id, value) => {
     set((state) => {
       const cell = state.grid.cells[id];
-
       if (!cell || cell.fixed) return state;
 
+      const updatedGrid = updateCell(state.grid, id, { value, notes: [] });
+
+      const validation = validateGrid(updatedGrid);
+
+      console.log("INVALID CELLS:", validation.invalid);
+
       return {
-        grid: {
-          ...state.grid,
-          cells: {
-            ...state.grid.cells,
-            [id]: {
-              ...cell,
-              value,
-            },
-          },
-        },
+        grid: updatedGrid,
+        invalidCells: validation.invalid,
       };
     });
   },
 
   setInputForSelected: (value: number | null) => {
-    set((state) => {
-      const selected = state.selectedCell;
+    const { selectedCell, grid, notesMode, setCellValue } = get();
 
-      if (!selected) return state;
+    if (!selectedCell) return;
 
-      const id = getCellId(selected.row, selected.col);
-      const cell = state.grid.cells[id];
+    const id = getCellId(selectedCell.row, selectedCell.col);
+    const cell = grid.cells[id];
 
-      if (!cell || cell.fixed) return state;
+    if (!cell || cell.fixed) return;
 
-      // Clear Case
-      if (value === null) {
-        return {
-          grid: updateCell(state.grid, id, {
-            value: null,
-            notes: [],
-          }),
-        };
-      }
+    // Notes Mode
+    if (notesMode && value !== null) {
+      set((state) => {
+        const current = state.grid.cells[id];
+        if (!current) return state;
 
-      // NOTES MODE
-      if (state.notesMode) {
-        const notes = cell.notes ?? [];
-
+        const notes = current.notes ?? [];
         const exists = notes.includes(value);
 
         const nextNotes = exists
           ? notes.filter((n) => n !== value)
-          : [...notes, value].sort();
+          : [...notes, value];
 
+        const updatedGrid = updateCell(state.grid, id, { notes: nextNotes });
         return {
-          grid: updateCell(state.grid, id, {
-            notes: nextNotes,
-          }),
+          grid: updatedGrid,
         };
-      }
-
-      // VALUE MODE
-      if (cell.value === value) return state;
-
-      return {
-        grid: updateCell(state.grid, id, {
-          value,
-          notes: [],
-        }),
-      };
-    });
+      });
+      return;
+    }
+    // Value / Clear Mode
+    setCellValue(id, value);
   },
 
   resetGrid: () => {

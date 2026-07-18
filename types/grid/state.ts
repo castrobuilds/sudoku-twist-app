@@ -13,4 +13,6 @@ export type GridState = {
 
   notesMode: boolean;
   toggleNotesMode: () => void;
+
+  invalidCells: Set<string>;
 };

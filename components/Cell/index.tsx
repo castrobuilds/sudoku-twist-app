@@ -10,9 +10,10 @@ type Props = {
   cell: CellType;
   row: number;
   col: number;
+  invalidCells: Set<string>;
 };
 
-export function Cell({ cell, row, col }: Props) {
+export function Cell({ cell, row, col, invalidCells }: Props) {
   // BORDERS
   const isRightBorder = (col + 1) % 3 === 0 && col !== 8;
   const isBottomBorder = (row + 1) % 3 === 0 && row !== 8;
@@ -27,6 +28,8 @@ export function Cell({ cell, row, col }: Props) {
     useStoreWithEqualityFn(useGridStore, selector, shallow);
 
   const setSelectedCell = useGridStore((s) => s.setSelectedCell);
+
+  const isInvalid = invalidCells.has(cell.id);
 
   // HANDLERS
   const handleClick = () => {
@@ -51,10 +54,12 @@ export function Cell({ cell, row, col }: Props) {
         ${cell.fixed ? "font-bold text-black" : "text-blue-600"}
         ${cell.error ? "bg-red-100" : ""}
         hover:bg-gray-100 cursor-pointer
-        ${isSelected ? "bg-yellow-300" : ""}
+        ${isSelected ? "bg-yellow-200" : ""}
         ${!isSelected && isSameRow ? "bg-yellow-100" : ""}
         ${!isSelected && isSameCol ? "bg-yellow-100" : ""}
         ${!isSelected && isSameBox ? "bg-yellow-50" : ""}
+        ${isInvalid ? "bg-red-100!" : ""}
+        transition-colors duration-200
       `}
     >
       {cell.value !== null ? (

@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { GridState } from "@/types/grid";
 import { createEmptyGrid, getCellId, updateCell } from "@/lib/grid";
 import { validateGrid } from "@/lib/validation/validateGrid";
+import { checkWin } from "@/lib/game/checkWin";
+import { GameStatus } from "@/types/game";
 
 export const useGridStore = create<GridState>((set, get) => ({
   grid: createEmptyGrid(9),
@@ -16,18 +18,33 @@ export const useGridStore = create<GridState>((set, get) => ({
   // ACTIONS
   setCellValue: (id, value) => {
     set((state) => {
+      // Prevent changes if the game is completed
+      if (state.gameStatus === "completed") return state;
+
+      // Get target cell
       const cell = state.grid.cells[id];
       if (!cell || cell.fixed) return state;
 
+      // Apply the value to the cell and clear notes
       const updatedGrid = updateCell(state.grid, id, { value, notes: [] });
 
+      // Validate the updated grid
       const validation = validateGrid(updatedGrid);
 
-      console.log("INVALID CELLS:", validation.invalid);
+      // Update Game Status when necessary
+      let nextStatus: GameStatus =
+        state.gameStatus === "not_started" ? "in_progress" : state.gameStatus;
+
+      // Check for win condition if the game is in progress
+      if (state.gameStatus === "in_progress") {
+        const isWin = checkWin(updatedGrid, validation.invalid);
+        if (isWin) nextStatus = "completed";
+      }
 
       return {
         grid: updatedGrid,
         invalidCells: validation.invalid,
+        gameStatus: nextStatus,
       };
     });
   },
@@ -69,8 +86,10 @@ export const useGridStore = create<GridState>((set, get) => ({
   resetGrid: () => {
     set({
       grid: createEmptyGrid(9),
+      invalidCells: new Set(),
       selectedCell: null,
       notesMode: false,
+      gameStatus: "not_started",
     });
   },
 

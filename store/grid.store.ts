@@ -15,6 +15,9 @@ export const useGridStore = create<GridState>((set, get) => ({
 
   gameStatus: "not_started",
 
+  timeElapsed: 0,
+  timerId: null,
+
   // ACTIONS
   setCellValue: (id, value) => {
     set((state) => {
@@ -38,7 +41,10 @@ export const useGridStore = create<GridState>((set, get) => ({
       // Check for win condition if the game is in progress
       if (state.gameStatus === "in_progress") {
         const isWin = checkWin(updatedGrid, validation.invalid);
-        if (isWin) nextStatus = "completed";
+        if (isWin) {
+          nextStatus = "completed";
+          get().stopTimer();
+        }
       }
 
       return {
@@ -84,6 +90,9 @@ export const useGridStore = create<GridState>((set, get) => ({
   },
 
   resetGrid: () => {
+    const { resetTimer } = get();
+
+    resetTimer();
     set({
       grid: createEmptyGrid(9),
       invalidCells: new Set(),
@@ -104,6 +113,10 @@ export const useGridStore = create<GridState>((set, get) => ({
   },
 
   startGame: (grid) => {
+    const { resetTimer, startTimer } = get();
+
+    resetTimer();
+
     set(() => ({
       grid,
       invalidCells: new Set(),
@@ -111,9 +124,39 @@ export const useGridStore = create<GridState>((set, get) => ({
       notesMode: false,
       gameStatus: "in_progress",
     }));
+
+    startTimer();
   },
 
   setGameStatus: (status) => {
     set({ gameStatus: status });
+  },
+
+  startTimer: () => {
+    const { timerId } = get();
+
+    // Prevent multiple timers from being set
+    if (timerId) return;
+
+    const id = setInterval(() => {
+      set((state) => ({ timeElapsed: state.timeElapsed + 1 }));
+    }, 1000);
+
+    set({ timerId: id });
+  },
+
+  stopTimer: () => {
+    const { timerId } = get();
+
+    if (timerId) {
+      clearInterval(timerId);
+      set({ timerId: null });
+    }
+  },
+
+  resetTimer: () => {
+    const { stopTimer } = get();
+    stopTimer();
+    set({ timeElapsed: 0 });
   },
 }));

@@ -11,6 +11,8 @@ export const useGridStore = create<GridState>((set, get) => ({
 
   invalidCells: new Set(),
 
+  gameStatus: "not_started",
+
   // ACTIONS
   setCellValue: (id, value) => {
     set((state) => {
@@ -80,5 +82,19 @@ export const useGridStore = create<GridState>((set, get) => ({
     set((state) => ({
       notesMode: !state.notesMode,
     }));
+  },
+
+  startGame: (grid) => {
+    set(() => ({
+      grid,
+      invalidCells: new Set(),
+      selectedCell: null,
+      notesMode: false,
+      gameStatus: "in_progress",
+    }));
+  },
+
+  setGameStatus: (status) => {
+    set({ gameStatus: status });
   },
 }));

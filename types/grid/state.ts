@@ -1,3 +1,4 @@
+import { GameStatus } from "../game";
 import { SelectedCell } from "./cell";
 import { Grid } from "./grid";
 
@@ -15,4 +16,8 @@ export type GridState = {
   toggleNotesMode: () => void;
 
   invalidCells: Set<string>;
+
+  gameStatus: GameStatus;
+  startGame: (grid: Grid) => void;
+  setGameStatus: (status: GameStatus) => void;
 };
